@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="2a80fab2-f41a-4758-9857-e2f6cf9c3100" name="vadim">
+        <fileTransfer rootFolder="/home/dobradostavka/domains/api.new-dating.com/public_html/basic" accessType="SFTP" host="vadim.pogonyalo.com" port="22" sshConfigId="2e977237-d31c-4cfd-b80f-e369ef0973cc" sshConfig="root@vadim.pogonyalo.com:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
