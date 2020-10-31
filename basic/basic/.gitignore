@@ -15,8 +15,11 @@ Thumbs.db
 # composer vendor dir
 /vendor
 
-
-/config
+/runtime
+/vagrant
+/widgets
+/config/db.php
+/config/Readme.txt
 
 # composer itself is not needed
 composer.phar
