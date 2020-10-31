@@ -47,15 +47,9 @@ $config = [
                 ],
             ],
         ],
-        //'dbOld' => $db,
+        'db' => $db,
 
-        'db' => [
-            'class' => 'yii\db\Connection',
-            'driverName' => 'sqlsrv',
-            'dsn' => 'sqlsrv:Server=176.36.204.194,49176;Database=DobraDB',
-            // динамически  логин пароль смотри тут \modules\v1\Module.php
-            'charset' => 'utf8'
-        ],
+
 
 
         'urlManager' => [
