@@ -22,4 +22,18 @@ class Mymodels extends Model
         }
         return $result[0]['CACC'];
     }
+
+    static function getCurrentUserInfo()
+    {
+        try {
+            $result = Yii::$app->db
+                // SQLSTATE[IMSSP]: The active result for the query contains no fields. - SET NOCOUNT ON;
+                ->createCommand("SET NOCOUNT ON; EXEC al_CLIENT_getClientData '" . Mymodels::getUserCACC()."'")
+                ->queryAll();
+        } catch (Exception $e) {
+            // ошибка
+            return json_encode($e);
+        }
+        return $result[0];
+    }
 }

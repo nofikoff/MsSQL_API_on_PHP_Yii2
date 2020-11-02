@@ -9,17 +9,21 @@ $config = [
     'defaultRoute' => '/site/index',
 
 
-    'name'=>'Бобра Доставка',
+    'name' => 'Бобра Доставка',
 
     'bootstrap' => ['log'],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
-        '@npm'   => '@vendor/npm-asset',
+        '@npm' => '@vendor/npm-asset',
     ],
     'components' => [
+
+
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'zrAb17HyoQrYi4Hzoo5x6qMR1BLIF3TK',
+            // отключаем ибо POST API
+            'enableCsrfValidation' => false,
         ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
@@ -50,8 +54,6 @@ $config = [
         'db' => $db,
 
 
-
-
         'urlManager' => [
 
             'enablePrettyUrl' => true,
@@ -60,11 +62,11 @@ $config = [
                 //'<action:\w+>' => 'site/<action>',
 
                 //http://basic-yii2.loc/profile/xxxxxx
-                '<controller:(profile)>/<id:\w+>' => '<controller>/index',
+                //'<controller:(profile)>/<id:\w+>' => '<controller>/index',
 
                 //http://basic-yii2.loc/ajax/profile-post/1111
-                ['pattern' => '/ajax/profile-post/<id:\w+>', 'route' => 'ajax/profile-post'],
-                '<controller:(profile)>/<id:\w+>' => '<controller>/index',
+                //['pattern' => '/ajax/profile-post/<id:\w+>', 'route' => 'ajax/profile-post'],
+                //'<controller:(profile)>/<id:\w+>' => '<controller>/index',
                 //'<controller:\w+>/<action:\w+>/<id:\d+>' => '<controller>/<action>?id=<id>',
                 //'<controller:\w+>/<id:\w+>' => '<controller>/<action>',
             ],

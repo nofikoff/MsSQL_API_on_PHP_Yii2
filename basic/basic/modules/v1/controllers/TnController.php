@@ -30,8 +30,9 @@ class TnController extends Controller
 
     }
 
-    public function actionView($id)
+    public function actionView()
     {
+        $id = $_REQUEST['id'];
         try {
             //http://api.new-dating.com/v1/tn/view/?id=10-01683
             $result = Yii::$app->db
@@ -44,6 +45,15 @@ class TnController extends Controller
         }
         // выкидываем последний элемент т.к. он служебный типа ВСЕГО - количество элементов в списке SQL результата
         //array_pop($result);
+        if (isset($result) and sizeof($result)) return json_encode($result);
+        else return json_encode("No data");
+
+    }
+
+
+    public function actionMyInfo()
+    {
+        $result = Mymodels::getCurrentUserInfo();
         if (isset($result) and sizeof($result)) return json_encode($result);
         else return json_encode("No data");
 
