@@ -28,7 +28,7 @@ class Mymodels extends Model
         try {
             $result = Yii::$app->db
                 // SQLSTATE[IMSSP]: The active result for the query contains no fields. - SET NOCOUNT ON;
-                ->createCommand("SET NOCOUNT ON; EXEC al_CLIENT_getClientData '" . Mymodels::getUserCACC()."'")
+                ->createCommand("SET NOCOUNT ON; EXEC al_CLIENT_getClientData '" . Mymodels::getUserCACC() . "'")
                 ->queryAll();
         } catch (Exception $e) {
             // ошибка
@@ -36,4 +36,46 @@ class Mymodels extends Model
         }
         return $result[0];
     }
+
+    // чтобы сквозная нумерация была у поьзоваталеймсли я правильно понял
+    static function getCurrentUserMaxTnNumber()
+    {
+        try {
+            $result = Yii::$app->db
+                // SQLSTATE[IMSSP]: The active result for the query contains no fields. - SET NOCOUNT ON;
+                ->createCommand("SET NOCOUNT ON; EXEC al_CLIENT_GET_NUMBER3 '" . Mymodels::getUserCACC() . "'")
+                ->queryAll();
+        } catch (Exception $e) {
+            // ошибка
+            return json_encode($e);
+        }
+        return $result[0]['MaxNum'];
+    }
+
+    static function checkAccessContact4DelUpd($ACC, $contact_id)
+    {
+        $select = "select COUNT(*) from Client_Klient where [ACC]='" . $ACC . "' and [ClientId]='" . $contact_id . "'";
+        $rr = Yii::$app->db
+            ->createCommand($select)
+            ->queryScalar();
+
+        if ($rr) return true;
+        return false;
+
+    }
+
+
+    static function checkAccessTn4DelUpd($ACC, $tn_id)
+    {
+        $select = "select COUNT(*) FROM [Client_Main] WHERE [ACC] ='" . $ACC . "' and [Wb_No] = '" . $tn_id . "'";
+        $rr = Yii::$app->db
+            ->createCommand($select)
+            ->queryScalar();
+
+        if ($rr) return true;
+        return false;
+
+    }
+
+    
 }

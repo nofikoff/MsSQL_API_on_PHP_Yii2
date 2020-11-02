@@ -33,10 +33,18 @@ class ContactsController extends Controller
     public function actionView()
     {
         try {
+
             //http://api.new-dating.com/v1/contacts/view/
             $id = $_REQUEST['id'];
+            $ACC = Mymodels::getUserCACC();
+            // ПРООВЕРКА ПРАВ ДОСТУПА НИЖЕ В ОСНОВНОМ ЗАПРОСЕ
+            //if (!Mymodels::checkAccessContact4DelUpd($ACC, $id)) return json_encode("No rules");
+
             $result = Yii::$app->db
-                ->createCommand("select ck.*,c.ruscnt from Client_Klient CK join Country C on c.CCode=CK.CountryCode where ClientId='$id'")
+                // ACC - добавил чтобы нельзя было увидеть чужие контакт не принадлежаещие пользователю
+                // ACC - добавил чтобы нельзя было увидеть чужие контакт не принадлежаещие пользователю
+                // ACC - добавил чтобы нельзя было увидеть чужие контакт не принадлежаещие пользователю
+                ->createCommand("select ck.*,c.ruscnt from Client_Klient CK join Country C on c.CCode=CK.CountryCode where ClientId='$id' AND ACC = " . $ACC)
                 ->queryOne();
         } catch (Exception $e) {
             // ошибка
@@ -44,17 +52,19 @@ class ContactsController extends Controller
         }
         // выкидываем последний элемент т.к. он служебный типа ВСЕГО - количество элементов в списке SQL результата
         //array_pop($result);
-        if (isset($result) and sizeof($result)) return json_encode($result);
+        if (isset($result)) return json_encode($result);
         else return json_encode("No data");
     }
 
     public function actionMarkDelete()
     {
-        $collate = 'collate SQL_Ukrainian_CP1251_CI_AS';
-        //запрещено менять город, ID назначения и страну здесь этих полне нет
+        $id = $_REQUEST['id'];
+        $ACC = Mymodels::getUserCACC();
+        if (!Mymodels::checkAccessContact4DelUpd($ACC, $id)) return json_encode("No rules");
+
         $set = "UPDATE Client_Klient SET  
                       NeedDel = 1
-                    where ClientId= " . $_REQUEST['id'] . "; ";
+                    where ClientId= " . $id;
         try {
             //http://api.new-dating.com/v1/contacts/update/
             Yii::$app->db
@@ -71,6 +81,21 @@ class ContactsController extends Controller
 
     public function actionUpdate()
     {
+
+        // защита от одинарных кавычек в запросе
+        $_REQUEST = array_map(
+            function ($item) {
+                return str_replace("'", "`", $item);
+            },
+            $_REQUEST
+        );
+
+
+        $id = $_REQUEST['id'];
+        $ACC = Mymodels::getUserCACC();
+        if (!Mymodels::checkAccessContact4DelUpd($ACC, $id)) return json_encode("No rules");
+
+        // возможно укр мову не пропускает!!!
         $collate = 'collate SQL_Ukrainian_CP1251_CI_AS';
         //запрещено менять город, ID назначения и страну здесь этих полне нет
         $set = "UPDATE Client_Klient SET  
@@ -82,7 +107,7 @@ class ContactsController extends Controller
                     C_ZIP='" . $_REQUEST['C_ZIP'] . "' " . $collate . ",
                     C_RAJON=UPPER('" . $_REQUEST['C_RAJON'] . "' " . $collate . "),
                     C_Adr=UPPER('" . $_REQUEST['C_Adr'] . "' " . $collate . ")  
-                    where ClientId= " . $_REQUEST['id']
+                    where ClientId= " . $id
             . "; ";
 
         try {
@@ -101,6 +126,16 @@ class ContactsController extends Controller
 
     public function actionCreate()
     {
+
+        // защита от одинарных кавычек в запросе
+        $_REQUEST = array_map(
+            function ($item) {
+                return str_replace("'", "`", $item);
+            },
+            $_REQUEST
+        );
+
+
         $result = array();
 
         if (isset($_REQUEST['Loc'])) $Loc = $_REQUEST['Loc']; else $Loc = '';
@@ -200,7 +235,7 @@ class ContactsController extends Controller
         $lastInsertID = Yii::$app->db->getLastInsertID();
 
         // отобразим текущий контакт по $_REQUEST[id]
-        $_REQUEST['id']=$lastInsertID;
+        $_REQUEST['id'] = $lastInsertID;
         return $this->actionView();
 
 
