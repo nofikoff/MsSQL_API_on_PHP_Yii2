@@ -3,6 +3,7 @@
 namespace app\modules\v1\controllers;
 
 use app\modules\v1\models\Mymodels;
+use mysql_xdevapi\CollectionModify;
 use Yii;
 use yii\db\Exception;
 use yii\web\Controller;
@@ -109,6 +110,7 @@ class TnController extends Controller
     public function actionCreate()
     {
 
+
         // защита от одинарных кавычек в запросе
         $_REQUEST = array_map(
             function ($item) {
@@ -116,6 +118,7 @@ class TnController extends Controller
             },
             $_REQUEST
         );
+
 
         if ($_REQUEST['D_Acc'] == '') {
             $result['error'] = 1;
@@ -157,6 +160,10 @@ class TnController extends Controller
         // на всякий случай все параметрц  $_REQUEST
         // и обязательные тоже проверим вдруг в будущем перстанут быть обязательнями
         // инициализация $_REQUEST
+
+        $_REQUEST['ACC'] = Mymodels::getUserCACC();
+        $_REQUEST['Wb_No'] = Mymodels::getCurrentUserMaxTnNumber();
+
 
         $_REQUEST['D_Acc'] = isset($_REQUEST['D_Acc']) ? $_REQUEST['D_Acc'] : date('Ymd');
         $_REQUEST['ORG'] = isset($_REQUEST['ORG']) ? $_REQUEST['ORG'] : '';
@@ -200,11 +207,11 @@ class TnController extends Controller
         $_REQUEST['T_DEL'] = isset($_REQUEST['T_DEL']) ? $_REQUEST['T_DEL'] : '';
         $_REQUEST['PCS'] = isset($_REQUEST['PCS']) ? $_REQUEST['PCS'] : 1;
         $_REQUEST['WT'] = isset($_REQUEST['WT']) ? $_REQUEST['WT'] : 0;
-        $_REQUEST['T_Chg'] = isset($_REQUEST['T_Chg']) ? $_REQUEST['T_Chg'] : 0;
+
+
         $_REQUEST['Vol_H'] = isset($_REQUEST['Vol_H']) ? $_REQUEST['Vol_H'] : 0;
         $_REQUEST['Vol_L'] = isset($_REQUEST['Vol_L']) ? $_REQUEST['Vol_L'] : 0;
         $_REQUEST['Vol_W'] = isset($_REQUEST['Vol_W']) ? $_REQUEST['Vol_W'] : 0;
-        $_REQUEST['Vol_WT'] = isset($_REQUEST['Vol_WT']) ? $_REQUEST['Vol_WT'] : 0;
         $_REQUEST['V_Car'] = isset($_REQUEST['V_Car']) ? $_REQUEST['V_Car'] : 0;
         $_REQUEST['Descr'] = isset($_REQUEST['Descr']) ? $_REQUEST['Descr'] : '';
         $_REQUEST['DTD'] = isset($_REQUEST['DTD']) ? $_REQUEST['DTD'] : '';
@@ -216,8 +223,6 @@ class TnController extends Controller
         // поле в базе ограничено 15 знакми
         $_REQUEST['Pack_Other'] = isset($_REQUEST['Pack_Other']) ? mb_substr($_REQUEST['Pack_Other'], 0, 15) : '';
 
-
-        //    print_r($_REQUEST);
         $mssql_query = "INSERT INTO [Client_Main]
             ([Wb_No]
             ,[D_Acc]
@@ -271,11 +276,11 @@ class TnController extends Controller
             )
             
             VALUES  
-            ('" . Mymodels::getCurrentUserMaxTnNumber() . "'
+            ('" . $_REQUEST['Wb_No']. "'
             ,'" . $_REQUEST['D_Acc'] . "' 
             ,'" . $_REQUEST['ORG'] . "'
             ,'" . $_REQUEST['DEST'] . "'
-            ,'" . Mymodels::getUserCACC() . "'
+            ,'" . $_REQUEST['ACC'] . "'
             
             
             
@@ -309,7 +314,7 @@ class TnController extends Controller
             ,'" . $_REQUEST['P_Adr'] . "'
          
             
-            ,'" . Mymodels::getUserCACC() . "'
+            ,'" . $_REQUEST['ACC'] . "'
 
             
             ,'" . $_REQUEST['T_SRV'] . "'
@@ -319,14 +324,15 @@ class TnController extends Controller
             
             ,'" . $_REQUEST['PCS'] . "'
             ,'" . $_REQUEST['WT'] . "'
-            ,'" . $_REQUEST['T_Chg'] . "'
+            ,'" . Mymodels::actionCalc_T_Chg() . "'
             
                     
             ,ROUND('" . $_REQUEST['Vol_H'] . "',0)
             ,ROUND('" . $_REQUEST['Vol_L'] . "',0)
             ,ROUND('" . $_REQUEST['Vol_W'] . "',0)
             
-           ,'" . $_REQUEST['Vol_WT'] . "'
+            ,ROUND('" . Mymodels::actionGetVol_WT() . "',0)
+           
            ,'" . $_REQUEST['V_Car'] . "'
            ,'" . $_REQUEST['Descr'] . "'
            
@@ -349,7 +355,7 @@ class TnController extends Controller
         $lastInsertID = Yii::$app->db->getLastInsertID();
 
         // отобразим текущий контакт по $_REQUEST[id]
-        $_REQUEST['id'] = $lastInsertID;
+        $_REQUEST['id'] = $_REQUEST['Wb_No'];
         return $this->actionView();
 
 
