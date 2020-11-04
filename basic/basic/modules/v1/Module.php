@@ -9,8 +9,11 @@ class Module extends \yii\base\Module
 {
     public function init()
     {
-        Yii::$app->db->username=$_REQUEST['login'];
-        Yii::$app->db->password=$_REQUEST['password'];
+        if (isset($_REQUEST['login'])) {
+            Yii::$app->db->username = $_REQUEST['login'];
+            Yii::$app->db->password = $_REQUEST['password'];
+        }
         parent::init();
+
     }
 }
